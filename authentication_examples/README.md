@@ -15,7 +15,7 @@ In this repo you will find Fireblocks API authentication mechanism implementatio
 - [PHP](https://github.com/fireblocks/developers-hub/tree/main/authentication_examples/php)
 - [Go](https://github.com/fireblocks/developers-hub/tree/main/authentication_examples/go)
 - [C#](https://github.com/fireblocks/developers-hub/tree/main/authentication_examples/cs)
-
+- [Ruby](https://github.com/fireblocks/developers-hub/tree/main/authentication_examples/ruby)
 The examples include the access token generation method (JWT) in addition to a GET and POST call examples.
 
 ⚠️ **Note**
