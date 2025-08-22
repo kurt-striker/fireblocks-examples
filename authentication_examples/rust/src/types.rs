@@ -23,6 +23,7 @@ pub struct VaultAccountResponse {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[allow(unused)]
 pub struct PagedVaultAccountsResponse {
     accounts: Vec<VaultAccountResponse>,
     paging: Option<Paging>,
