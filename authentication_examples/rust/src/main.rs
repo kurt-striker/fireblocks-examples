@@ -6,9 +6,7 @@ use clap::Parser;
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use sha2::{Digest, Sha256};
-use std::fmt::format;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
