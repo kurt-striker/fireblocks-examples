@@ -2,6 +2,7 @@ mod types;
 
 use crate::types::*;
 use chrono::Utc;
+use clap::Parser;
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
@@ -281,11 +282,19 @@ impl ApiTokenProvider {
         Ok(aar.address)
     }
 }
+#[derive(Parser, Debug)]
+struct Args {
+    #[clap(short, long)]
+    api_key: String,
+    #[clap(short, long)]
+    private_key_path: String,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let api_key = "don't-commit-me".to_string();
-    let private_key = std::fs::read_to_string("/Users/secure-user/private.pem")?;
+    let args = Args::parse();
+    let api_key = args.api_key;
+    let private_key = std::fs::read_to_string(args.private_key_path)?;
     let api_url = "https://api.fireblocks.io".to_string(); // For sandbox use: https://sandbox-api.fireblocks.io
 
     let fireblocks = ApiTokenProvider::new(private_key, api_key.clone(), api_url.clone());
