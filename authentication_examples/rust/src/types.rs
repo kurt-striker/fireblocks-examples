@@ -12,7 +12,7 @@ pub struct VaultAccountPaginatedResponse {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VaultAccountResponse {
-    id: String,
+    pub(crate) id: String,
     name: String,
     #[serde(rename = "hiddenOnUI")]
     hidden_on_ui: bool,
@@ -323,4 +323,13 @@ pub struct RequestOptions {
 pub struct NCW {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wallet_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivateAssetResponse {
+    pub id: String,
+    pub address: String,
+    pub legacy_address: Option<String>,
+    pub tag: Option<String>,
 }

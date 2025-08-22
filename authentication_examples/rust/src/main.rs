@@ -5,6 +5,7 @@ use chrono::Utc;
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::fmt::format;
 use uuid::Uuid;
@@ -265,33 +266,42 @@ impl ApiTokenProvider {
         println!("Create transaction response:\n{:#?}", create_tx_response);
         Ok(create_tx_response)
     }
+
+    async fn activate_asset(
+        &self,
+        vault_id: &str,
+        asset_id: &str,
+    ) -> Result<String, Box<dyn std::error::Error>> {
+        const ACCOUNTS_BASE: &str = "/v1/vault/accounts";
+        let activate_asset_path = format!("{ACCOUNTS_BASE}/{vault_id}/{asset_id}/activate");
+
+        let res = self.post_request(activate_asset_path.as_str(), "").await?;
+        let aar = serde_json::from_str::<ActivateAssetResponse>(&res)?;
+
+        Ok(aar.address)
+    }
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let api_key = "API_KEY".to_string();
-    let private_key = "API_SECRET_KEY_PATH";
+    let api_key = "don't-commit-me".to_string();
+    let private_key = std::fs::read_to_string("/Users/secure-user/private.pem")?;
     let api_url = "https://api.fireblocks.io".to_string(); // For sandbox use: https://sandbox-api.fireblocks.io
 
-    let fireblocks =
-        ApiTokenProvider::new(private_key.to_string(), api_key.clone(), api_url.clone());
-    let tx = TransactionArguments {
-        asset_id: "ETH_TEST5".to_string(),
-        operation: TransactionOperation::TRANSFER,
-        source: TransferPeerPath {
-            peer_type: PeerType::VAULT_ACCOUNT,
-            id: "0".to_string(),
-        },
-        destination: Some(DestinationTransferPeerPath {
-            peer_type: PeerType::VAULT_ACCOUNT,
-            id: "0".to_string(),
-        }),
-        amount: "1.0".to_string(),
-        note: "Sample transaction".to_string(),
-    };
-    println!("Creating TX");
-    let c = fireblocks.create_tx(&tx).await?;
-    println!("Sumitted TX: {:#?}", c);
+    let fireblocks = ApiTokenProvider::new(private_key, api_key.clone(), api_url.clone());
+
+    let vault = fireblocks
+        .create_vault(
+            "test/vaults-with/activate-asset",
+            false,
+            "my-customer-ref",
+            false,
+        )
+        .await?;
+    println!("Created vault: {:#?}", vault);
+
+    let mainnet_usdc_addr = fireblocks.activate_asset(vault.id.as_str(), "USDC").await?;
+    println!("Created mainnet usdc addr: {:#?}", mainnet_usdc_addr);
     Ok(())
 }
 
@@ -415,5 +425,4 @@ mod tests {
             .unwrap();
         println!("{:#?}", c)
     }
-
 }
